@@ -1,0 +1,80 @@
+repositories {
+    jcenter()
+    mavenLocal()
+}
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.0.70")
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0"
+        classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.8"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'net.serenity-bdd.aggregator'
+apply plugin: 'com.github.sherter.google-java-format'
+apply plugin: 'org.sonarqube'
+
+compileJava.dependsOn 'googleJavaFormat'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+test {systemProperties = System.properties}
+
+tasks.withType(Test) {
+    systemProperty "file.encoding", "UTF-8"
+}
+
+ext {
+    serenityVersion = '2.0.70'
+    serenityCucumberVersion = '1.9.45'
+}
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.jdbc.username", "admin"
+        property "sonar.jdbc.password", "admin"
+        property "sonar.projectKey", "APPSVP"
+        property "sonar.projectName", "APPSVP"
+        property "sonar.projectVersion", "1.0"
+        property "sonar.sources", "src/main"
+        property "sonar.test", "src/test"
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.assertj:assertj-core:3.13.2'
+    testImplementation 'org.slf4j:slf4j-api:1.7.2'
+    testImplementation 'org.slf4j:slf4j-log4j12:1.7.2'
+    implementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-junit:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-cucumber:$rootProject.ext.serenityCucumberVersion"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:$rootProject.ext.serenityVersion"
+    implementation "io.appium:java-client:7.0.0"
+    implementation "net.serenity-bdd:serenity-ensure:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-rest-assured:$rootProject.ext.serenityVersion"
+
+    implementation "org.apache.commons:commons-lang3:3.0"
+    implementation "com.google.zxing:javase:3.4.1"
+    implementation 'javax.mail:mail:1.5.0-b01'
+    implementation 'org.json:json:20210307'
+    implementation 'com.google.api-client:google-api-client:1.23.0'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+    implementation 'com.google.apis:google-api-services-gmail:v1-rev83-1.23.0'
+
+}
+
+gradle.startParameter.continueOnFailure = true
